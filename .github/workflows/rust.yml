@@ -33,10 +33,13 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
+          args: --no-default-features --features ${{ matrix.featureSets }}
+
 
       - uses: actions-rs/cargo@v1
         with:
-          command: test --features ${{ matrix.featureSets }}
+          command: test
+          args: --no-default-features --features ${{ matrix.featureSets }}
 
   quality:
     runs-on: ubuntu-latest

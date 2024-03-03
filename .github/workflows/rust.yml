@@ -17,10 +17,10 @@ jobs:
         include:
           - rust: beta
             experimental: true
-            features: ["default", "derive"]
+            features: default
           - rust: nightly
             experimental: true
-            features: ["default", "derive"]
+            features: default
     continue-on-error: ${{ matrix.experimental }}
 
     steps:

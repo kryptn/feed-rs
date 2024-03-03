@@ -11,14 +11,16 @@ jobs:
         # Test stable + version used in freedesktop sdk - tracks https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/blob/master/elements/components/rust.bst#L134
         rust: [stable, 1.75.0]
         experimental: [false]
-        featureSets: ["default", "derive"]
+        features: ["default", "derive"]
 
         # also test on beta + nightly for advance warning of breakage
         include:
           - rust: beta
             experimental: true
+            features: ["default", "derive"]
           - rust: nightly
             experimental: true
+            features: ["default", "derive"]
     continue-on-error: ${{ matrix.experimental }}
 
     steps:
@@ -33,13 +35,13 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --no-default-features --features ${{ matrix.featureSets }}
+          args: --no-default-features --features ${{ matrix.features }}
 
 
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --no-default-features --features ${{ matrix.featureSets }}
+          args: --no-default-features --features ${{ matrix.features }}
 
   quality:
     runs-on: ubuntu-latest

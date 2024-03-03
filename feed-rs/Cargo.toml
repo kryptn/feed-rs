@@ -2,14 +2,11 @@
 name = "feed-rs"
 version = "1.4.0"
 edition = '2021'
-authors = ["Hiroki Kumamoto <kumabook@live.jp>", "Mark Pritchard <mpritcha@gmail.com>"]
-include = [
-    "**/*.rs",
-    "Cargo.toml",
-    "LICENSE-MIT",
-    "README.md",
-    "fixture/*"
+authors = [
+    "Hiroki Kumamoto <kumabook@live.jp>",
+    "Mark Pritchard <mpritcha@gmail.com>",
 ]
+include = ["**/*.rs", "Cargo.toml", "LICENSE-MIT", "README.md", "fixture/*"]
 license = "MIT"
 homepage = "https://github.com/feed-rs/feed-rs"
 repository = "https://github.com/feed-rs/feed-rs.git"
@@ -17,6 +14,7 @@ description = "A unified feed parser that handles Atom, RSS 2.0, RSS 1.0, RSS 0.
 keywords = ["feed", "rss", "atom", "json", "jsonfeed"]
 categories = ["parser-implementations"]
 readme = "README.md"
+
 
 [badges]
 travis-ci = { repository = "feed-rs/feed-rs", branch = "master" }
@@ -32,3 +30,9 @@ serde_json = "1.0.111"
 siphasher = "1.0.0"
 url = "2.5.0"
 uuid = { version = "1.6.1", features = ["v4"] }
+
+mime_serde_shim = { version = "0.2.2", optional = true }
+
+[features]
+default = []
+derive = ["mime_serde_shim", "chrono/serde", "url/serde"]

@@ -1,7 +1,16 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
+
+#[cfg(not(feature = "derive"))]
 use mime::Mime;
+#[cfg(feature = "derive")]
+use mime_serde_shim::Wrapper as Mime;
+
+#[cfg(feature = "derive")]
+use mime_serde_shim;
+#[cfg(feature = "derive")]
+use serde::{Deserialize, Serialize};
 
 use crate::parser::util;
 #[cfg(test)]
@@ -32,6 +41,7 @@ use url::Url;
 ///   * RSS 1:
 ///     * channel - rdf:about attribute (pointer to feed), textinput (text box e.g. for search)
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Feed {
     /// Type of this feed (e.g. RSS2, Atom etc)
     pub feed_type: FeedType,
@@ -220,6 +230,7 @@ impl Feed {
 
 /// Type of a feed (RSS, Atom etc)
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub enum FeedType {
     Atom,
     JSON,
@@ -230,6 +241,7 @@ pub enum FeedType {
 
 /// An item within a feed
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Entry {
     /// A unique identifier for this item with a feed. If not supplied it is initialised to a hash of the first link or a UUID if not available.
     /// * Atom (required): Identifies the entry using a universally unique and permanent URI.
@@ -400,6 +412,7 @@ impl Entry {
 /// [Atom spec]: http://www.atomenabled.org/developers/syndication/#category
 /// [RSS 2 spec]: https://validator.w3.org/feed/docs/rss2.html#ltcategorygtSubelementOfLtitemgt
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Category {
     /// The category as a human readable string
     /// * Atom (required): Identifies the category.
@@ -440,6 +453,7 @@ impl Category {
 /// [Atom spec]: http://www.atomenabled.org/developers/syndication/#contentElement
 /// [RSS 2.0]: https://validator.w3.org/feed/docs/rss2.html#ltenclosuregtSubelementOfLtitemgt
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Content {
     /// Atom
     /// * If the type attribute ends in +xml or /xml, then an xml document of this type is contained inline.
@@ -462,7 +476,7 @@ impl Default for Content {
     fn default() -> Content {
         Content {
             body: None,
-            content_type: mime::TEXT_PLAIN,
+            content_type: mime::TEXT_PLAIN.into(),
             length: None,
             src: None,
         }
@@ -496,6 +510,7 @@ impl Content {
 ///
 /// Atom: Identifies the software used to generate the feed, for debugging and other purposes.
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Generator {
     /// Atom: Additional data
     /// RSS 2: A string indicating the program used to generate the channel.
@@ -535,6 +550,7 @@ impl Generator {
 /// [RSS 2 spec]: https://validator.w3.org/feed/docs/rss2.html#ltimagegtSubelementOfLtchannelgt
 /// [RSS 1 spec]: https://validator.w3.org/feed/docs/rss1.html#s5.4
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Image {
     /// Link to the image
     /// * Atom: The URL to an image or logo
@@ -598,7 +614,7 @@ impl Image {
 ///
 /// [Atom spec]: http://www.atomenabled.org/developers/syndication/#link
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Link {
     /// Link to additional content
     /// * Atom: The URI of the referenced resource (typically a Web page).
@@ -668,6 +684,7 @@ impl Link {
 /// The top-level representation of a media object
 /// i.e. combines "media:*" elements from the RSS Media spec such as those under a media:group
 #[derive(Clone, Debug, Default, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct MediaObject {
     /// Title of the object (from the media:title element)
     pub title: Option<Text>,
@@ -739,6 +756,7 @@ impl MediaObject {
 
 /// Represents a "media:community" item from the RSS Media spec
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct MediaCommunity {
     /// Star rating
     pub stars_avg: Option<f64>,
@@ -783,6 +801,7 @@ impl MediaCommunity {
 
 /// Represents a "media:content" item from the RSS Media spec
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct MediaContent {
     /// The direct URL
     pub url: Option<Url>,
@@ -848,6 +867,7 @@ impl MediaContent {
 
 /// Represents a "media:credit" item from the RSS Media spec
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct MediaCredit {
     /// The entity being credited
     pub entity: String,
@@ -861,6 +881,7 @@ impl MediaCredit {
 
 /// Rating of the feed, item or media within the content
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct MediaRating {
     // The scheme (defaults to "simple" per the spec)
     pub urn: String,
@@ -881,6 +902,7 @@ impl MediaRating {
 
 /// Represents a "media:text" item from the RSS Media spec
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct MediaText {
     /// The text
     pub text: Text,
@@ -902,6 +924,7 @@ impl MediaText {
 
 /// Represents a "media:thumbnail" item from the RSS Media spec
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct MediaThumbnail {
     /// The thumbnail image
     pub image: Image,
@@ -919,6 +942,7 @@ impl MediaThumbnail {
 ///
 /// [Atom spec]: http://www.atomenabled.org/developers/syndication/#person
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Person {
     /// Atom: human-readable name for the person.
     /// JSON Feed: human-readable name for the person.
@@ -955,6 +979,7 @@ impl Person {
 
 /// Textual content, or link to the content, for a given entry.
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "derive", derive(Serialize, Deserialize))]
 pub struct Text {
     pub content_type: Mime,
     pub src: Option<String>,
@@ -964,7 +989,7 @@ pub struct Text {
 impl Text {
     pub(crate) fn new(content: String) -> Text {
         Text {
-            content_type: mime::TEXT_PLAIN,
+            content_type: mime::TEXT_PLAIN.into(),
             src: None,
             content: content.trim().to_string(),
         }
@@ -972,7 +997,7 @@ impl Text {
 
     pub(crate) fn html(content: String) -> Text {
         Text {
-            content_type: mime::TEXT_HTML,
+            content_type: mime::TEXT_HTML.into(),
             src: None,
             content: content.trim().to_string(),
         }

@@ -1,6 +1,9 @@
 use std::io::BufRead;
 
+#[cfg(not(feature = "derive"))]
 use mime::Mime;
+#[cfg(feature = "derive")]
+use mime_serde_shim::Wrapper as Mime;
 
 use crate::model::{Category, Content, Entry, Feed, FeedType, Generator, Image, Link, MediaContent, MediaObject, Person};
 use crate::parser::itunes::{handle_itunes_channel_element, handle_itunes_item_element};
@@ -186,7 +189,7 @@ fn handle_content_encoded<R: BufRead>(element: Element<R>) -> ParseFeedResult<Op
         } else {
             Some(Content {
                 body: Some(string),
-                content_type: mime::TEXT_HTML,
+                content_type: mime::TEXT_HTML.into(),
                 src,
                 ..Default::default()
             })

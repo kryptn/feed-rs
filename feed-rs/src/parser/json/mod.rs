@@ -1,6 +1,9 @@
 use std::io::Read;
 
+#[cfg(not(feature = "derive"))]
 use mime::Mime;
+#[cfg(feature = "derive")]
+use mime_serde_shim::Wrapper as Mime;
 
 use crate::model::{Category, Content, Entry, Feed, FeedType, Image, Link, Person, Text};
 use crate::parser::util::if_some_then;
@@ -123,9 +126,9 @@ fn handle_item(parser: &Parser, ji: JsonItem) -> Entry {
     if_some_then(ji.title, |text| entry.title = Some(Text::new(text)));
 
     // Content HTML, content text and summary are mapped across to our model with the preference toward HTML and explicit summary fields
-    entry.content = handle_content(ji.content_html, mime::TEXT_HTML);
+    entry.content = handle_content(ji.content_html, mime::TEXT_HTML.into());
     entry.summary = ji.summary.map(Text::new);
-    if let Some(content_text) = handle_content(ji.content_text, mime::TEXT_PLAIN) {
+    if let Some(content_text) = handle_content(ji.content_text, mime::TEXT_PLAIN.into()) {
         // If we don't have HTML content, use the text content as the entry content
         // otherwise, if the summary was not provided, we push the text there
 
